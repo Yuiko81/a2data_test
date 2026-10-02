@@ -1,0 +1,5 @@
+asyncpg
+fastapi
+pydantic>=2,<3
+redis
+uvicorn[standard]

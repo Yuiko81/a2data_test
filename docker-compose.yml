@@ -28,7 +28,72 @@ services:
         condition: service_healthy
     restart: always
 
+  generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: generator
+    command: python generator.py
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data-volume:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: log-api
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      REDIS_STREAM_NAME: logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: log-worker
+    command: python worker.py
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
+      REDIS_URL: redis://redis:6379/0
+      REDIS_STREAM_NAME: logs
+      REDIS_CONSUMER_GROUP: log-workers
+      REDIS_CONSUMER_NAME: worker-1
+      WORKER_BATCH_SIZE: 1000
+      WORKER_FLUSH_INTERVAL_MS: 500
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
 
 volumes:
   postgres-db-volume:
+  redis-data-volume:
