@@ -63,11 +63,14 @@ services:
     container_name: log-api
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     environment:
+      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
       REDIS_URL: redis://redis:6379/0
       REDIS_STREAM_NAME: logs
     ports:
       - "8000:8000"
     depends_on:
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     restart: unless-stopped
