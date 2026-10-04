@@ -1,0 +1,13 @@
+Query: service=payments, level=ERROR, UTC day 2026-10-04, limit=101
+
+Limit  (cost=0.42..257.18 rows=101 width=63) (actual time=19.436..21.174 rows=101 loops=1)
+  Buffers: shared hit=2982
+  ->  Index Scan Backward using logs_20261004_pkey on logs_20261004 logs  (cost=0.42..14749.90 rows=5802 width=63) (actual time=19.435..21.158 rows=101 loops=1)
+        Index Cond: (("timestamp" >= '2026-10-04 00:00:00+00'::timestamp with time zone) AND ("timestamp" < '2026-10-05 00:00:00+00'::timestamp with time zone))
+        Filter: ((service = 'payments'::text) AND (level = 'ERROR'::text))
+        Rows Removed by Filter: 72190
+        Buffers: shared hit=2982
+Planning:
+  Buffers: shared hit=217
+Planning Time: 0.647 ms
+Execution Time: 21.202 ms

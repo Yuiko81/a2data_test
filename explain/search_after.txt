@@ -1,0 +1,11 @@
+Query: service=payments, level=ERROR, UTC day 2026-10-04, limit=101
+
+Limit  (cost=0.42..244.88 rows=101 width=63) (actual time=0.050..0.287 rows=101 loops=1)
+  Buffers: shared hit=104
+  ->  Index Scan using logs_20261004_service_level_timestamp_id_idx on logs_20261004 logs  (cost=0.42..7641.61 rows=3157 width=63) (actual time=0.049..0.279 rows=101 loops=1)
+        Index Cond: ((service = 'payments'::text) AND (level = 'ERROR'::text) AND ("timestamp" >= '2026-10-04 00:00:00+00'::timestamp with time zone) AND ("timestamp" < '2026-10-05 00:00:00+00'::timestamp with time zone))
+        Buffers: shared hit=104
+Planning:
+  Buffers: shared hit=271
+Planning Time: 0.443 ms
+Execution Time: 0.306 ms

@@ -1,0 +1,19 @@
+Query: service=payments, level=ERROR, UTC day 2026-10-04, limit=100, offset=8000
+
+Limit  (cost=7248.80..7248.80 rows=1 width=70) (actual time=6.163..6.176 rows=100 loops=1)
+  Buffers: shared hit=1200
+  ->  Sort  (cost=7238.37..7248.80 rows=4173 width=70) (actual time=5.478..5.943 rows=8100 loops=1)
+        Sort Key: logs."timestamp" DESC, logs.id DESC
+        Sort Method: quicksort  Memory: 1623kB
+        Buffers: shared hit=1200
+        ->  Bitmap Heap Scan on logs_20261004 logs  (cost=444.06..6987.43 rows=4173 width=70) (actual time=1.200..3.320 rows=9328 loops=1)
+              Recheck Cond: ((service = 'payments'::text) AND (level = 'ERROR'::text) AND ("timestamp" >= '2026-10-04 00:00:00+00'::timestamp with time zone) AND ("timestamp" < '2026-10-05 00:00:00+00'::timestamp with time zone))
+              Heap Blocks: exact=1134
+              Buffers: shared hit=1194
+              ->  Bitmap Index Scan on logs_20261004_service_level_timestamp_id_idx  (cost=0.00..443.01 rows=4173 width=0) (actual time=1.111..1.111 rows=9328 loops=1)
+                    Index Cond: ((service = 'payments'::text) AND (level = 'ERROR'::text) AND ("timestamp" >= '2026-10-04 00:00:00+00'::timestamp with time zone) AND ("timestamp" < '2026-10-05 00:00:00+00'::timestamp with time zone))
+                    Buffers: shared hit=60
+Planning:
+  Buffers: shared hit=270
+Planning Time: 0.675 ms
+Execution Time: 6.261 ms

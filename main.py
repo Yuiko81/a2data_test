@@ -86,7 +86,7 @@ def decode_cursor(cursor: str) -> CursorData:
 
 
 async def fetch_logs(
-    pool: asyncpg.Pool,
+    database: asyncpg.Pool | asyncpg.Connection,
     *, # означает что следующие параметры нужно передавать по имени типа service="auth"
     service: str | None,
     level: LogLevel | None,
@@ -127,7 +127,7 @@ async def fetch_logs(
         LIMIT {limit_placeholder}
     """
 
-    rows = await pool.fetch(query, *values)
+    rows = await database.fetch(query, *values)
     has_next_page = len(rows) > limit
     items = [LogRead.model_validate(dict(row)) for row in rows[:limit]]
     next_cursor = encode_cursor(items[-1]) if has_next_page else None # создание нового курсора если есть нест страница

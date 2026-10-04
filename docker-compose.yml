@@ -156,6 +156,22 @@ services:
         condition: service_started
     profiles: ["load"]
 
+  insert-benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python insert_benchmark.py
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      INSERT_BENCHMARK_RECORDS: ${INSERT_BENCHMARK_RECORDS}
+      INSERT_BENCHMARK_BATCH_SIZE: ${INSERT_BENCHMARK_BATCH_SIZE}
+      INSERT_BENCHMARK_WARMUP_RUNS: ${INSERT_BENCHMARK_WARMUP_RUNS}
+      INSERT_BENCHMARK_MEASURE_RUNS: ${INSERT_BENCHMARK_MEASURE_RUNS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["load"]
+
   tests:
     build:
       context: .
