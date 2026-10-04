@@ -8,10 +8,7 @@ import redis.asyncio as redis
 from redis.exceptions import ResponseError
 
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://myuser:mypassword@localhost:5432/mydb",
-)
+DATABASE_URL = os.environ["DATABASE_URL"]
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 STREAM_NAME = os.getenv("REDIS_STREAM_NAME", "logs") # имя потока в redis
 CONSUMER_GROUP = os.getenv("REDIS_CONSUMER_GROUP", "log-workers") # имя группы воркеров

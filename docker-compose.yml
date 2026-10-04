@@ -4,9 +4,9 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -35,11 +35,14 @@ services:
     container_name: generator
     command: python generator.py
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      SEED_TOTAL: ${SEED_TOTAL}
+      SEED_BATCH_SIZE: ${SEED_BATCH_SIZE}
 
     depends_on:
       postgres:
         condition: service_healthy
+    profiles: ["generator"]
 
   redis:
     image: redis:7-alpine
@@ -63,9 +66,9 @@ services:
     container_name: log-api
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
-      REDIS_URL: redis://redis:6379/0
-      REDIS_STREAM_NAME: logs
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_STREAM_NAME: ${REDIS_STREAM_NAME}
     ports:
       - "8000:8000"
     depends_on:
@@ -82,13 +85,13 @@ services:
     container_name: log-worker
     command: python worker.py
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
-      REDIS_URL: redis://redis:6379/0
-      REDIS_STREAM_NAME: logs
-      REDIS_CONSUMER_GROUP: log-workers
-      REDIS_CONSUMER_NAME: worker-1
-      WORKER_BATCH_SIZE: 1000
-      WORKER_FLUSH_INTERVAL_MS: 500
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_STREAM_NAME: ${REDIS_STREAM_NAME}
+      REDIS_CONSUMER_GROUP: ${REDIS_CONSUMER_GROUP}
+      REDIS_CONSUMER_NAME: ${REDIS_CONSUMER_NAME}
+      WORKER_BATCH_SIZE: ${WORKER_BATCH_SIZE}
+      WORKER_FLUSH_INTERVAL_MS: ${WORKER_FLUSH_INTERVAL_MS}
     depends_on:
       postgres:
         condition: service_healthy
@@ -103,9 +106,9 @@ services:
     container_name: log-retention
     command: python retention.py
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
-      RETENTION_DAYS: 7
-      RETENTION_INTERVAL_SECONDS: 3600
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      RETENTION_DAYS: ${RETENTION_DAYS}
+      RETENTION_INTERVAL_SECONDS: ${RETENTION_INTERVAL_SECONDS}
     depends_on:
       postgres:
         condition: service_healthy
@@ -118,9 +121,9 @@ services:
     container_name: log-partition-manager
     command: python partition_manager.py
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
-      PARTITIONS_AHEAD: 1
-      PARTITION_CREATION_INTERVAL_SECONDS: 86400
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      PARTITIONS_AHEAD: ${PARTITIONS_AHEAD}
+      PARTITION_CREATION_INTERVAL_SECONDS: ${PARTITION_CREATION_INTERVAL_SECONDS}
     depends_on:
       postgres:
         condition: service_healthy
@@ -132,7 +135,8 @@ services:
       dockerfile: Dockerfile
     command: pytest -q
     environment:
-      TEST_DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      TEST_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     depends_on:
       postgres:
         condition: service_healthy

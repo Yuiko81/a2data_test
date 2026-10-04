@@ -17,10 +17,7 @@ MESSAGES = (
     "Invalid request",
 )
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://myuser:mypassword@localhost:5432/mydb",
-)
+DATABASE_URL = os.environ["DATABASE_URL"]
 TOTAL_RECORDS = int(os.getenv("SEED_TOTAL", "5000000"))
 BATCH_SIZE = int(os.getenv("SEED_BATCH_SIZE", "5000"))
 

@@ -8,10 +8,7 @@ import pytest
 from partition_manager import create_missing_partitions, get_partitions
 
 
-TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql://myuser:mypassword@localhost:5432/mydb",
-)
+TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
 
 
 @pytest.mark.asyncio

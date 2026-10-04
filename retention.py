@@ -8,10 +8,7 @@ from datetime import datetime, timedelta, timezone
 import asyncpg
 
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://myuser:mypassword@localhost:5432/mydb",
-)
+DATABASE_URL = os.environ["DATABASE_URL"]
 RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "7"))
 RETENTION_INTERVAL_SECONDS = int(os.getenv("RETENTION_INTERVAL_SECONDS", "3600"))
 

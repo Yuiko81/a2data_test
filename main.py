@@ -16,10 +16,7 @@ from redis.exceptions import RedisError
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 STREAM_NAME = os.getenv("REDIS_STREAM_NAME", "logs")
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://myuser:mypassword@localhost:5432/mydb",
-)
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 
 class LogLevel(str, Enum):
