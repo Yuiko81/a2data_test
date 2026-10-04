@@ -96,6 +96,33 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  retention:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: log-retention
+    command: python retention.py
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
+      RETENTION_DAYS: 7
+      RETENTION_INTERVAL_SECONDS: 3600
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: pytest -q
+    environment:
+      TEST_DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydb
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["test"]
+
 
 volumes:
   postgres-db-volume:
