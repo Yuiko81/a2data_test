@@ -17,7 +17,7 @@ TEST_DATABASE_URL = os.getenv(
 @pytest.mark.asyncio
 async def test_retention_drops_only_partitions_older_than_seven_days() -> None:
     connection = await asyncpg.connect(TEST_DATABASE_URL)
-    schema = f"retention_test_{uuid.uuid4().hex}"
+    schema = f"retention_test_{uuid.uuid4().hex}" # создание отдельной схемы для тестов
     table = "logs"
     now = datetime(2026, 10, 2, 12, tzinfo=timezone.utc)
     expired_day = date(2026, 9, 24)
