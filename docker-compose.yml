@@ -129,6 +129,33 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  load-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python load_test.py
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_STREAM_NAME: ${REDIS_STREAM_NAME}
+      LOAD_API_BASE_URL: ${LOAD_API_BASE_URL}
+      LOAD_WARMUP_SECONDS: ${LOAD_WARMUP_SECONDS}
+      LOAD_DURATION_SECONDS: ${LOAD_DURATION_SECONDS}
+      LOAD_LOGS_PER_SECOND: ${LOAD_LOGS_PER_SECOND}
+      LOAD_BATCH_SIZE: ${LOAD_BATCH_SIZE}
+      LOAD_SEARCH_RPS: ${LOAD_SEARCH_RPS}
+      LOAD_SEARCH_P95_LIMIT_MS: ${LOAD_SEARCH_P95_LIMIT_MS}
+      LOAD_REQUEST_TIMEOUT_SECONDS: ${LOAD_REQUEST_TIMEOUT_SECONDS}
+      LOAD_DRAIN_TIMEOUT_SECONDS: ${LOAD_DRAIN_TIMEOUT_SECONDS}
+      LOAD_MIN_DATABASE_ROWS: ${LOAD_MIN_DATABASE_ROWS}
+      LOAD_MAX_SCHEDULER_LAG_MS: ${LOAD_MAX_SCHEDULER_LAG_MS}
+    depends_on:
+      api:
+        condition: service_started
+      worker:
+        condition: service_started
+    profiles: ["load"]
+
   tests:
     build:
       context: .
@@ -137,8 +164,11 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       TEST_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      TEST_REDIS_URL: ${REDIS_URL}
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     profiles: ["test"]
 

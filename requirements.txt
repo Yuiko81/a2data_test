@@ -1,4 +1,5 @@
 asyncpg
+aiohttp
 fastapi
 pydantic>=2,<3
 redis
